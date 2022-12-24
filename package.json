@@ -1,0 +1,17 @@
+{
+  "name": "codinterview",
+  "version": "1.0.0",
+  "description": "An audio app using WebRTC",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Lola Odelola",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "peer": "^0.5.3",
+    "peerjs": "^1.3.1"
+  }
+}
