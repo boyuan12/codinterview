@@ -8,11 +8,24 @@
 </head>
 <body>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js" integrity="sha384-/KNQL8Nu5gCHLqwqfQjA689Hhoqgi2S84SNUxC3roTe4EhJ9AfLkp8QiQcU8AMzI" crossorigin="anonymous"></script>
+    <form>
+        <textarea id="message"></textarea>
+        <button type="button" id="button">Send</button>
+    </form>
     <script>
         var socket = io();
         socket.on("connect", () => {
             console.log("A user connected")
-            // socket.emit("connect")
+        });
+
+        document.getElementById("button").onclick = () => {
+            socket.emit("chat_message", {
+                message: document.getElementById("message").value
+            });
+        }
+
+        socket.on("chat_message", function(data) {
+            console.log(data)
         });
     </script>
 </body>

@@ -179,7 +179,10 @@ app.get("/chat", (request, response) => {
 })
 
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    socket.on("chat_message", function(data) {
+        console.log(data)
+        socket.broadcast.emit("chat_message", data);
+    });
 });
 
 server.listen(port);
