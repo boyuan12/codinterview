@@ -20,6 +20,8 @@ const { Server } = require("socket.io");
 const { response } = require("express");
 const io = new Server(server);
 
+var id = []
+
 
 const peerServer = ExpressPeerServer(server, {
     proxied: true,
@@ -41,7 +43,7 @@ app.get("/", (request, response) => {
 });
 
 app.get("/ide", (request, response) => {
-    response.render(__dirname + "/editor.ejs")
+    response.render(__dirname + "/editor.html")
 });
 
 app.post("/api/compile", jsonParser, (request, response) => {
@@ -179,10 +181,14 @@ app.get("/chat", (request, response) => {
 })
 
 io.on('connection', (socket) => {
-    socket.on("chat_message", function(data) {
-        console.log(data)
-        socket.broadcast.emit("chat_message", data);
+    socket.on("editor_change", function(data) {
+        if (!id.includes(data.data)) {
+            console.log(data.data)
+            socket.broadcast.emit("editor_change", data)
+            id.push(data.data)
+        } 
     });
+
 });
 
 server.listen(port);
