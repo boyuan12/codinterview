@@ -1,0 +1,25 @@
+name: "Valid Parentheses"
+filename: "ValidParentheses.yaml"
+description: "Given a string `s` containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'['` and `']'`, determine if the input string is valid.
+
+An input string is valid if:
+
+Open brackets must be closed by the same type of brackets.
+Open brackets must be closed in the correct order.
+Every close bracket has a corresponding open bracket of the same type."
+boilerplate-python: "class Solution:\n    def isValid(self, strs):\n"
+
+input_arguments: 1
+test_python_init: "sol = Solution()\n"
+test_python_cmd: "print(sol.isValid(<arg0>))"
+
+arguments:
+  - str
+
+checks:
+  inputs: [["'()'"], ["'()[]{}'"], ["'(]'"]]
+  outputs: [true, true, false]
+  
+tests:
+  inputs: [["'()'"], ["'()[]{}'"], ["'(]'"]]
+  outputs: [true, true, false]

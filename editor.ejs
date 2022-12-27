@@ -62,12 +62,14 @@
                 <th scope="col">Status</th>
               </tr>
             </thead>
-            <tbody id="tbody">
-              
-            </tbody>
+            <tbody id="tbody"></tbody>
           </table>
         <button class="btn btn-primary" id="run">Run</button>
-        <button class="btn btn-success">Submit</button>
+        <button class="btn btn-success" id="submit">Submit</button>
+        <button type="button" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="This button will run your code and display stdout" id="debug">
+            Debug
+        </button>
+
     </div>
 
     <div class="right">
@@ -81,9 +83,36 @@
         <span id="filename"></span>
     </div>
 
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Results</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-b"></div>
+                <div class="mb-3">
+                    <label for="expected-output" class="form-label">Expected Output</label>
+                    <input type="text" class="form-control" id="expected-output">
+                </div>
+                <div class="mb-3">
+                    <label for="actual-output" class="form-label">Actual Output</label>
+                    <input type="text" class="form-control" id="actual-output" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="stdout" class="form-label">Stdout</label>
+                    <textarea class="form-control" id="stdout" disabled></textarea>
+                </div>            
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
-
-
     <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.14.0/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
     <script>
         var editor = ace.edit("editor");
@@ -121,8 +150,20 @@
                     for (let j=0; j<data["arguments"].length; j++) {
                         if (typeof(data["checks"]["inputs"][i][j]) === typeof([])) {
                             args += data["arguments"][j] + " = " + "[" + data["checks"]["inputs"][i][j] + "]" + "\n"
+                            if (i == 0) {
+                                var div = document.createElement("div")
+                                div.setAttribute("class", "input-group mb-3")
+                                div.innerHTML = `<span class="input-group-text" id="arg-${i}${j}">${data["arguments"][j]} = </span><input type="text" class="form-control custom-args" aria-describedby="arg-${i}${j}" value="[${data["checks"]["inputs"][i][j]}]">`
+                                document.getElementById("modal-b").appendChild(div)
+                            }
                         } else {
                             args += data["arguments"][j] + " = " + data["checks"]["inputs"][i][j] + "\n"
+                            if (i == 0) {
+                                var div = document.createElement("div")
+                                div.setAttribute("class", "input-group mb-3")
+                                div.innerHTML = `<span class="input-group-text" id="arg-${i}${j}">${data["arguments"][j]} = </span><input type="text" class="form-control custom-args" aria-describedby="arg-${i}${j}" value="${data["checks"]["inputs"][i][j]}">`
+                                document.getElementById("modal-b").appendChild(div)
+                            }
                         }
                     }
                     var tr = document.createElement("tr")
@@ -134,6 +175,10 @@
                     
                     var tdExpected = document.createElement("td")
                     tdExpected.innerText = data["checks"]["outputs"][i]
+
+                    if (i == 0) {
+                        document.getElementById("expected-output").value += data["checks"]["outputs"][i]
+                    }
 
                     var tdActual = document.createElement("td")
                     tdActual.id = "actual-" + i
@@ -151,7 +196,7 @@
 
                     document.getElementById("tbody").appendChild(tr)
                 }
-
+                
         })
 
         document.getElementById("run").onclick = () => {
@@ -195,8 +240,54 @@
                 console.log(data)
             })
         }
+
+        document.getElementById("debug").onclick = () => {
+            var customArgs = document.getElementsByClassName("custom-args")
+            var args = []
+            for (let i=0; i<customArgs.length; i++) {
+                args.push(customArgs[i].value)
+            }
+
+            fetch("/api/debug", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "code": editor.getValue(),
+                    "filename": document.getElementById("filename").innerText,
+                    "args": args,
+                    "expected": document.getElementById("expected-output").value
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let myModal = new bootstrap.Modal(document.getElementById('myModal'))
+                myModal.show()
+                var stdout = data.run.output.split("\n")
+                var actualOut = stdout.at(-2)
+                
+                stdout.pop()
+                stdout.pop()
+
+                document.getElementById("stdout").value = stdout.join("\n")
+                document.getElementById("actual-output").value = actualOut
+
+                if (data.run.stderr.length != 0) {
+                    document.getElementById("stdout").style.color = "red"
+                    document.getElementById("actual-output").style.color = "red"
+                } else {
+                    document.getElementById("stdout").style.color = "black"
+                    document.getElementById("actual-output").style.color = "black"
+                }
+            })
+        }
     </script>
 
-
+    <script>
+        // initialize tooltips
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    </script>
 </body>
 </html>

@@ -14,7 +14,12 @@ const fs = require('fs');
 const problemsPath = path.join(__dirname, 'problems');
 const yaml = require('js-yaml');
 const req = require('request');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const { stringify } = require("querystring");
+const { Server } = require("socket.io");
+const { response } = require("express");
+const io = new Server(server);
+
 
 const peerServer = ExpressPeerServer(server, {
     proxied: true,
@@ -91,7 +96,10 @@ app.post("/api/compile", jsonParser, (request, response) => {
 
                 var o = output[actualOutput]
 
-                if (String(output[actualOutput]).toLocaleLowerCase() != String(fileData[type]["outputs"][actualOutput]).toLocaleLowerCase()) {
+                console.log('EXPECTED: ', JSON.stringify(fileData[type]["outputs"][actualOutput]).toLocaleLowerCase().valueOf().replaceAll("'", "").replaceAll('"', ''))
+                console.log('ACTUAL', JSON.stringify(output[actualOutput]).toLocaleLowerCase().valueOf().replaceAll("'", "").replaceAll('"', ''))
+
+                if (JSON.stringify(output[actualOutput]).toLocaleLowerCase().replaceAll("'", "").replaceAll('"', '') != JSON.stringify(fileData[type]["outputs"][actualOutput]).toLocaleLowerCase().replaceAll("'", "").replaceAll('"', '')) {
                     testCaseStatus = false
                 }
                 
@@ -130,7 +138,49 @@ app.get("/api/problem", (request, response) => {
     })
 })
 
+app.post("/api/debug", jsonParser, (request, response) => {
+    var filename = request.body.filename
+    var fileData = yaml.load(fs.readFileSync(path.join(__dirname, 'problems', filename)))
+    var code = request.body.code + "\n"
+    code += fileData["test_python_init"] + "\n"
+    var expected = request.body.expected
+    var args = request.body.args
+    var cmd = fileData.test_python_cmd
 
+    console.log(args)
+
+    for (let arg=0; arg<args.length; arg++) {
+        if (typeof(args[arg]) == typeof([])) {
+            cmd = cmd.replace("<arg" + arg + ">", "[" + args[arg] + "]")
+        } else {
+            cmd = cmd.replace("<arg" + arg + ">", args[arg])
+        }
+    }
+
+    code += cmd
+
+    req('https://emkc.org/api/v2/piston/execute', { json: true, method: "POST", body: {
+        language: "python",
+        version: "3.10.0",
+        files: [
+            {
+                "content": code
+            }
+        ]
+    } }, (err, res, body) => {
+        if (err) { return console.log(err); }
+        console.log(body)
+        return response.json(body)
+    })
+})
+
+app.get("/chat", (request, response) => {
+    response.sendFile(__dirname + "/chat.html")
+})
+
+io.on('connection', (socket) => {
+    console.log('a user connected');
+});
 
 server.listen(port);
 console.log('Listening on: ' + port);

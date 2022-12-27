@@ -15,6 +15,6 @@ checks:
   outputs: [true, false, false]
   
 tests:
-  inputs: [[121], [-121], [10], [-2147447412]]
-  outputs: [true, false, false, false]
+  inputs: [12345, -54321, 54321, 12321]
+  outputs: [false, false, false, true]
  

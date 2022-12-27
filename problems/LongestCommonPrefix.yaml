@@ -1,0 +1,21 @@
+name: "Longest Common Prefix"
+filename: "LongestCommonPrefix.yaml"
+description: "Write a function to find the longest common prefix string amongst an array of strings.
+
+If there is no common prefix, return an empty string ''."
+boilerplate-python: "class Solution:\n    def longestCommonPrefix(self, strs):\n"
+
+input_arguments: 1
+test_python_init: "sol = Solution()\n"
+test_python_cmd: "print(sol.longestCommonPrefix(<arg0>))"
+
+arguments:
+  - strs
+
+checks:
+  inputs: [[["'flower'","'flow'","'flight'"]]]
+  outputs: ["'fl'"]
+  
+tests:
+  inputs: [[["'flower'","'flow'","'flight'"]]]
+  outputs: ["'fl'"]
