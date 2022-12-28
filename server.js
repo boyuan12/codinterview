@@ -43,7 +43,7 @@ app.get("/", (request, response) => {
 });
 
 app.get("/ide", (request, response) => {
-    response.render(__dirname + "/editor.html")
+    response.sendFile(__dirname + "/editor.html")
 });
 
 app.post("/api/compile", jsonParser, (request, response) => {
@@ -91,7 +91,7 @@ app.post("/api/compile", jsonParser, (request, response) => {
             var output = body["run"]["output"].split("\n")
             output.pop()
 
-            var results = []
+            var results = [fileData["arguments"]]
 
             for (let actualOutput=0; actualOutput<output.length; actualOutput++) {
                 var testCaseStatus = true

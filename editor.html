@@ -63,7 +63,7 @@
               </tr>
             </thead>
             <tbody id="tbody"></tbody>
-          </table>
+        </table>
         <button class="btn btn-primary" id="run">Run</button>
         <button class="btn btn-success" id="submit">Submit</button>
         <button type="button" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="This button will run your code and display stdout" id="debug">
@@ -107,11 +107,37 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-primary" id="debug-button">Run Code</button>
             </div>
           </div>
         </div>
     </div>
+
+    <div class="modal fade" id="testModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Error</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-b-submit"></div>
+                <div class="mb-3">
+                    <label for="expected-output" class="form-label">Expected Output</label>
+                    <input type="text" class="form-control" id="expected-output-sub" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="actual-output" class="form-label">Actual Output</label>
+                    <input type="text" class="form-control" id="actual-output-sub" disabled>
+                </div>        
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.14.0/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
     <script>
@@ -241,7 +267,70 @@
             })
         }
 
+        document.getElementById("submit").onclick = () => {
+            fetch("/api/compile", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "code": editor.getValue(),
+                    "filename": document.getElementById("filename").innerText,
+                    "type": "tests"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === undefined) {
+                    for (let i=0; i<data.length; i++) {
+                        
+                        if (typeof(data[i]) === 'object' && !Array.isArray(data[i]) && data[i] !== null) {
+                            let myModal = new bootstrap.Modal(document.getElementById('testModal'))
+                            myModal.show()
+                            
+                            // TODO
+                            for (let j=0; j<data[0].length; j++) {
+                                if (typeof(data[i][j]) === typeof([])) {
+                                    var div = document.createElement("div")
+                                    div.setAttribute("class", "input-group mb-3")
+                                    div.innerHTML = `<span class="input-group-text" id="arg-s-${i}${j}">${data[0][j]} = </span><input type="text" class="form-control" aria-describedby="arg-s-${i}${j}" value="[${data[i]["Input"][j]}]" disabled>`
+                                    document.getElementById("modal-b-submit").appendChild(div)
+                                } else {
+                                    var div = document.createElement("div")
+                                    div.setAttribute("class", "input-group mb-3")
+                                    div.innerHTML = `<span class="input-group-text" id="arg-s-${i}${j}">${data[0][j]} = </span><input type="text" class="form-control" aria-describedby="arg-s-${i}${j}" value="${data[i]["Input"][j]}" disabled>`
+                                    document.getElementById("modal-b-submit").appendChild(div)
+                                }
+
+                            
+                            }
+
+                            document.getElementById("expected-output-sub").value = data[i].Expected
+                            document.getElementById("actual-output-sub").value = data[i].Actual
+                            break
+                        }
+                    }
+                } else {
+                    console.log(data)
+                    // var errorLineNum = data.error.split("Line ")[0].split("\n")[2].slice("-1"); // Potential Error: if user printed output the string literal Line
+                    // console.log(errorLineNum)
+                    // editor.getSession().setAnnotations([{
+                    //     row: errorLineNum-1,
+                    //     column: 0,
+                    //     text: data.error.split("Line ")[0].split("\n")[2],
+                    //     type: "error" // also warning and information
+                    // }]);
+                }
+            })
+        }
+
+
         document.getElementById("debug").onclick = () => {
+            let myModal = new bootstrap.Modal(document.getElementById('myModal'))
+            myModal.show()
+        }
+
+        document.getElementById("debug-button").onclick = () => {
             var customArgs = document.getElementsByClassName("custom-args")
             var args = []
             for (let i=0; i<customArgs.length; i++) {
@@ -262,8 +351,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                let myModal = new bootstrap.Modal(document.getElementById('myModal'))
-                myModal.show()
+
                 var stdout = data.run.output.split("\n")
                 var actualOut = stdout.at(-2)
                 
