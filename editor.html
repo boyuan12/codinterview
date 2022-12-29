@@ -245,7 +245,7 @@
                             document.getElementById("check-" + i).innerHTML = "<span class='badge text-bg-success'>Success</span>"
                             document.getElementById("actual-" + i).innerText = "<---"
                         } else {
-                            document.getElementById("actual-" + i).innerText = data[i]["Actual"]
+                            document.getElementById("actual-" + i).innerText = data[i+1]["Actual"]
                             document.getElementById("check-" + i).innerHTML = "<span class='badge text-bg-danger'>Failure</span>"
                         }
                     }
