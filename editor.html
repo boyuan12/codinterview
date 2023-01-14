@@ -252,8 +252,10 @@
                     }
                 } else {
                     for (let i=0; i<data.checks; i++) {
-                        document.getElementById("actual-" + String(i-1)).innerText = "One of your testcases caused following error: " + data.error
-                        document.getElementById("check-" + String(i-1)).innerHTML = "<span class='badge text-bg-warning'>Error</span>"
+                        console.log(data)
+                        console.log(data.checks)
+                        document.getElementById("actual-" + String(i)).innerText = "One of your testcases caused following error: " + data.error
+                        document.getElementById("check-" + String(i)).innerHTML = "<span class='badge text-bg-warning'>Error</span>"
                     }
                     // var errorLineNum = data.error.split("Line ")[0].split("\n")[2].slice("-1"); // Potential Error: if user printed output the string literal Line
                     // console.log(errorLineNum)
