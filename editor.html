@@ -240,19 +240,20 @@
             .then(response => response.json())
             .then(data => {
                 if (data.code === undefined) {
-                    for (let i=0; i<data.length; i++) {
+                    for (let i=1; i<data.length; i++) {
+                        console.log("LOGGING VARIABLE i: " + i)
                         if (data[i] === true) {
-                            document.getElementById("check-" + i).innerHTML = "<span class='badge text-bg-success'>Success</span>"
-                            document.getElementById("actual-" + i).innerText = "<---"
+                            document.getElementById("check-" + String(i-1)).innerHTML = "<span class='badge text-bg-success'>Success</span>"
+                            document.getElementById("actual-" + String(i-1)).innerText = "<---"
                         } else {
-                            document.getElementById("actual-" + i).innerText = data[i+1]["Actual"]
-                            document.getElementById("check-" + i).innerHTML = "<span class='badge text-bg-danger'>Failure</span>"
+                            document.getElementById("actual-" + String(i-1)).innerText = data[i]["Actual"]
+                            document.getElementById("check-" + String(i-1)).innerHTML = "<span class='badge text-bg-danger'>Failure</span>"
                         }
                     }
                 } else {
                     for (let i=0; i<data.checks; i++) {
-                        document.getElementById("actual-" + i).innerText = "One of your testcases caused following error: " + data.error
-                        document.getElementById("check-" + i).innerHTML = "<span class='badge text-bg-warning'>Error</span>"
+                        document.getElementById("actual-" + String(i-1)).innerText = "One of your testcases caused following error: " + data.error
+                        document.getElementById("check-" + String(i-1)).innerHTML = "<span class='badge text-bg-warning'>Error</span>"
                     }
                     // var errorLineNum = data.error.split("Line ")[0].split("\n")[2].slice("-1"); // Potential Error: if user printed output the string literal Line
                     // console.log(errorLineNum)

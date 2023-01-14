@@ -98,7 +98,7 @@ app.post("/api/compile", jsonParser, (request, response) => {
 
                 var o = output[actualOutput]
 
-                console.log('EXPECTED: ', JSON.stringify(fileData[type]["outputs"][actualOutput]).toLocaleLowerCase().valueOf().replaceAll("'", "").replaceAll('"', ''))
+                console.log('EXPECTED: ', JSON.stringify(fileData[type]["outputs"][actualOutput]).toLocaleLowerCase().valueOf().replaceAll("'", "").replaceAll('"', '')) // TODO: Somehow causing error
                 console.log('ACTUAL', JSON.stringify(output[actualOutput]).toLocaleLowerCase().valueOf().replaceAll("'", "").replaceAll('"', ''))
 
                 if (JSON.stringify(output[actualOutput]).toLocaleLowerCase().replaceAll("'", "").replaceAll('"', '') != JSON.stringify(fileData[type]["outputs"][actualOutput]).toLocaleLowerCase().replaceAll("'", "").replaceAll('"', '')) {
