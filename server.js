@@ -176,8 +176,8 @@ app.post("/api/debug", jsonParser, (request, response) => {
     })
 })
 
-app.get("/chat", (request, response) => {
-    response.sendFile(__dirname + "/chat.html")
+app.get("/live", (request, response) => {
+    response.sendFile(__dirname + "/live.html")
 })
 
 io.on('connection', (socket) => {
@@ -189,6 +189,10 @@ io.on('connection', (socket) => {
         } 
     });
 
+    socket.on("update_stdout", function(data) {
+        console.log(data)
+        socket.broadcast.emit("update_stdout", data)
+    });
 });
 
 server.listen(port);
