@@ -1,0 +1,29 @@
+name: "Pascal Triangle"
+filename: "PascalTriangle.yaml"
+description: "Given an integer `numRows`, return the first numRows of **Pascal's triangle**.
+
+In **Pascal's triangle**, each number is the sum of the two numbers directly above it as shown:
+
+![Gif Demostration for Pascal Triangle](https://upload.wikimedia.org/wikipedia/commons/0/0d/PascalTriangleAnimated2.gif)
+
+**Constraints:**
+- `1 <= numRows <= 30`
+"
+boilerplate-python: "class Solution:\n    def searchInsert(self, nums, target):\n"
+
+input_arguments: 2
+test_python_init: "sol = Solution()\n"
+test_python_cmd: "print(sol.searchInsert(<arg0>, <arg1>))"
+
+arguments:
+  - nums
+  - target
+
+checks:
+  inputs: [[[1,3,5,6], 5]]
+  outputs: [true, false, false]
+  
+tests:
+  inputs: [[[1,3,5,6], 5]]
+  outputs: [true, false, false]
+ 
