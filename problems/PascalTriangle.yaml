@@ -9,21 +9,19 @@ In **Pascal's triangle**, each number is the sum of the two numbers directly abo
 **Constraints:**
 - `1 <= numRows <= 30`
 "
-boilerplate-python: "class Solution:\n    def searchInsert(self, nums, target):\n"
+boilerplate-python: "class Solution:\n    def generate(self, numRows):\n"
 
-input_arguments: 2
+input_arguments: 1
 test_python_init: "sol = Solution()\n"
-test_python_cmd: "print(sol.searchInsert(<arg0>, <arg1>))"
+test_python_cmd: "print(sol.generate(<arg0>))"
 
 arguments:
-  - nums
-  - target
+  - numRows
 
 checks:
-  inputs: [[[1,3,5,6], 5]]
-  outputs: [true, false, false]
+  inputs: [[5]]
+  outputs: [[[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]]
   
 tests:
-  inputs: [[[1,3,5,6], 5]]
-  outputs: [true, false, false]
- 
+  inputs: [[5]]
+  outputs: [[[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]]
